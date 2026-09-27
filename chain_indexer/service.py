@@ -16,7 +16,13 @@ import logging
 from typing import Any
 
 from .chain import GENESIS_PARENT, ChainGraph, Node, ReorgPlan
-from .models import AcceptKind, Block, IngestError, IngestResult, RejectReason, Transaction
+from .models import (
+    AcceptKind,
+    Block,
+    IngestError,
+    IngestResult,
+    RejectReason,
+)
 from .store import Store
 from .validation import parse_block
 
@@ -201,7 +207,7 @@ class IngestService:
         if plan.fork_height is None:
             basis = "初次建链"
         elif plan.rollback_height == 0:
-            basis = f"分叉点在创世前，回滚整条旧链"
+            basis = "分叉点在创世前，回滚整条旧链"
         else:
             basis = (
                 f"分叉高度={plan.fork_height}，旧链回滚高度>={plan.rollback_height}，"
@@ -301,9 +307,7 @@ class IngestService:
         parent = self._store.get_block_row(block.parent_hash)
         if parent is None:
             return False
-        if parent["height"] != block.height - 1:
-            return False
-        return True
+        return parent["height"] == block.height - 1
 
     def _find_archived_genesis(self) -> str | None:
         rows = self._store.get_children(GENESIS_PARENT)

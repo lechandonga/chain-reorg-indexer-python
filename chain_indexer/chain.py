@@ -9,8 +9,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass
-from typing import Callable, Iterable, Sequence
 
 GENESIS_PARENT = "0x0"
 
@@ -106,14 +106,12 @@ class ChainGraph:
 
 
 def _is_contiguous(path: tuple[Node, ...]) -> bool:
-    expected = 0
     prev_hash = GENESIS_PARENT
-    for node in path:
+    for expected, node in enumerate(path):
         if node.height != expected:
             return False
         if node.parent_hash != prev_hash:
             return False
-        expected += 1
         prev_hash = node.hash
     return True
 

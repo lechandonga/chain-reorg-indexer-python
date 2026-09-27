@@ -9,6 +9,7 @@
 
 from __future__ import annotations
 
+import json
 import os
 from typing import Any
 
@@ -115,7 +116,7 @@ def create_app(store: Store | None = None) -> FastAPI:
 async def _read_json(request: Request) -> Any | JSONResponse:
     try:
         return await request.json()
-    except Exception:
+    except (json.JSONDecodeError, UnicodeDecodeError):
         return JSONResponse(
             status_code=REJECT_STATUS,
             content={
