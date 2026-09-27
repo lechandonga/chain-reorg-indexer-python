@@ -130,6 +130,19 @@ class Store:
             )
             return cur.fetchone() is not None
 
+    def canonical_tx_hashes(self, block_hashes: Iterable[str]) -> set[str]:
+        """给定一组（共享前缀）块哈希，返回这些块上已索引的交易哈希。"""
+        hashes = list(block_hashes)
+        if not hashes:
+            return set()
+        marks = ",".join("?" for _ in hashes)
+        with self._lock:
+            cur = self._conn.execute(
+                f"SELECT tx_hash FROM transactions WHERE block_hash IN ({marks})",
+                hashes,
+            )
+            return {row["tx_hash"] for row in cur.fetchall()}
+
     def has_canonical_tx(self, tx_hash: str) -> bool:
         with self._lock:
             cur = self._conn.execute(
